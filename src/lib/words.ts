@@ -9,16 +9,16 @@ export const isWordInWordList = (word: string) => {
   )
 }
 
-export const isWinningWord = (word: string) => {
-  return solution === word
+export const isWinningWord = (objectiveWord: string, word: string) => {
+  return objectiveWord === word
 }
 
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
-export const findFirstUnusedReveal = (word: string, guesses: string[]) => {
+export const findFirstUnusedReveal = (objectiveWord: string, word: string, guesses: string[]) => {
   const knownLetterSet = new Set<string>()
   for (const guess of guesses) {
-    const statuses = getGuessStatuses(guess)
+    const statuses = getGuessStatuses(objectiveWord, guess)
 
     for (let i = 0; i < guess.length; i++) {
       if (statuses[i] === 'correct' || statuses[i] === 'present') {

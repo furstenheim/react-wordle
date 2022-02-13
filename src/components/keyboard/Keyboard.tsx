@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { ENTER_TEXT, DELETE_TEXT } from '../../constants/strings'
 
 type Props = {
+  currentSolution: string
   onChar: (value: string) => void
   onDelete: () => void
   onEnter: () => void
@@ -15,10 +16,11 @@ export const Keyboard = ({
   onChar,
   onDelete,
   onEnter,
+  currentSolution,
   guesses,
   isRevealing,
 }: Props) => {
-  const charStatuses = getStatuses(guesses)
+  const charStatuses = getStatuses(currentSolution, guesses)
 
   const onClick = (value: string) => {
     if (value === 'ENTER') {

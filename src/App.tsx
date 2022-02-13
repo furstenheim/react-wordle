@@ -47,6 +47,7 @@ function App() {
   ).matches
 
   const [currentGuess, setCurrentGuess] = useState('')
+  const [currentSolution, setCurrentSolution] = useState(solution)
   const [isGameWon, setIsGameWon] = useState(false)
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false)
@@ -64,16 +65,30 @@ function App() {
   )
   const [successAlert, setSuccessAlert] = useState('')
   const [isRevealing, setIsRevealing] = useState(false)
-  const [streakLength, setStreakLength] = useState(0)
+  const [currentNumberOfGuesses, setCurrentNumberOfGuesses] = useState(0)
+  const [runningSolutions, setRunningSolutions] = useState<string[]>(() => {
+    return [solution, solution]
+  })
+  const [allGuesses, setAllGuesses] = useState<string[]>(() => {
+    return []
+  })
+
   const [guesses, setGuesses] = useState<string[]>(() => {
     const loaded = loadGameStateFromLocalStorage()
     if (loaded?.solution !== solution) {
       return []
     }
-    const gameWasWon = loaded.guesses.includes(solution)
+    setCurrentSolution(loaded?.currentSolution || solution)
+    setRunningSolutions(loaded?.runningSolutions || runningSolutions)
+    setAllGuesses(loaded?.allGuesses || allGuesses)
+    const gameWasWon = loaded.guesses.includes(
+      loaded?.currentSolution || solution
+    )
     if (gameWasWon) {
       setIsGameWon(true)
     }
+
+    setCurrentNumberOfGuesses(loaded?.currentNumberOfGuesses || 0)
     return loaded.guesses
   })
 
@@ -108,7 +123,14 @@ function App() {
   }
 
   useEffect(() => {
-    saveGameStateToLocalStorage({ guesses, solution })
+    saveGameStateToLocalStorage({
+      guesses,
+      solution,
+      currentNumberOfGuesses,
+      currentSolution,
+      runningSolutions,
+      allGuesses,
+    })
   }, [guesses])
 
   useEffect(() => {
@@ -161,7 +183,11 @@ function App() {
 
     // enforce hard mode - all guesses must contain all previously revealed letters
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses)
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentSolution,
+        currentGuess,
+        guesses
+      )
       if (firstMissingReveal) {
         setIsMissingLetterMessage(firstMissingReveal)
         setIsMissingPreviousLetters(true)
@@ -178,16 +204,20 @@ function App() {
       setIsRevealing(false)
     }, REVEAL_TIME_MS * MAX_WORD_LENGTH)
 
-    const winningWord = isWinningWord(currentGuess)
+    const winningWord = isWinningWord(currentSolution, currentGuess)
 
     if (currentGuess.length === MAX_WORD_LENGTH && !isGameWon) {
-      setStreakLength(streakLength + 1)
+      setCurrentNumberOfGuesses(currentNumberOfGuesses + 1)
       const nextGuesses = [...guesses, currentGuess]
+      const nextAllGueses = [...allGuesses, currentGuess]
+      const nextRunningSolutions = [...runningSolutions, solution]
       setGuesses(nextGuesses)
+      setAllGuesses(nextAllGueses)
       setCurrentGuess('')
+      setRunningSolutions(nextRunningSolutions)
 
       if (winningWord) {
-        setStats(addStatsForCompletedGame(stats, streakLength + 1))
+        setStats(addStatsForCompletedGame(stats, currentNumberOfGuesses + 1))
         return setIsGameWon(true)
       } else if (guesses.length === DISPLAYED_ROWS - 1) {
         nextGuesses.shift()
@@ -216,11 +246,13 @@ function App() {
         />
       </div>
       <Grid
+        currentSolution={currentSolution}
         guesses={guesses}
         currentGuess={currentGuess}
         isRevealing={isRevealing}
       />
       <Keyboard
+        currentSolution={currentSolution}
         onChar={onChar}
         onDelete={onDelete}
         onEnter={onEnter}
@@ -232,9 +264,10 @@ function App() {
         handleClose={() => setIsInfoModalOpen(false)}
       />
       <StatsModal
+        objectiveWords={runningSolutions}
         isOpen={isStatsModalOpen}
         handleClose={() => setIsStatsModalOpen(false)}
-        guesses={guesses}
+        guesses={allGuesses}
         gameStats={stats}
         isGameLost={isGameLost}
         isGameWon={isGameWon}

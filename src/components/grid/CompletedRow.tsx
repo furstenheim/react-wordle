@@ -2,12 +2,13 @@ import { getGuessStatuses } from '../../lib/statuses'
 import { Cell } from './Cell'
 
 type Props = {
+  currentSolution: string
   guess: string
   isRevealing?: boolean
 }
 
-export const CompletedRow = ({ guess, isRevealing }: Props) => {
-  const statuses = getGuessStatuses(guess)
+export const CompletedRow = ({ currentSolution, guess, isRevealing }: Props) => {
+  const statuses = getGuessStatuses(currentSolution, guess)
 
   return (
     <div className="flex justify-center mb-1">
