@@ -1,4 +1,4 @@
-import { MAX_CHALLENGES } from '../../constants/settings'
+import { DISPLAYED_ROWS } from '../../constants/settings'
 import { CompletedRow } from './CompletedRow'
 import { CurrentRow } from './CurrentRow'
 import { EmptyRow } from './EmptyRow'
@@ -11,8 +11,8 @@ type Props = {
 
 export const Grid = ({ guesses, currentGuess, isRevealing }: Props) => {
   const empties =
-    guesses.length < MAX_CHALLENGES - 1
-      ? Array.from(Array(MAX_CHALLENGES - 1 - guesses.length))
+    guesses.length < DISPLAYED_ROWS - 1
+      ? Array.from(Array(DISPLAYED_ROWS - 1 - guesses.length))
       : []
 
   return (
@@ -24,7 +24,7 @@ export const Grid = ({ guesses, currentGuess, isRevealing }: Props) => {
           isRevealing={isRevealing && guesses.length - 1 === i}
         />
       ))}
-      {guesses.length < MAX_CHALLENGES && <CurrentRow guess={currentGuess} />}
+      {guesses.length < DISPLAYED_ROWS && <CurrentRow guess={currentGuess} />}
       {empties.map((_, i) => (
         <EmptyRow key={i} />
       ))}

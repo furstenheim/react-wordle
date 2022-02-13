@@ -22,7 +22,6 @@ import {
 } from './constants/strings'
 import {
   MAX_WORD_LENGTH,
-  MAX_CHALLENGES,
   ALERT_TIME_MS,
   REVEAL_TIME_MS,
   GAME_LOST_INFO_DELAY,
@@ -72,9 +71,6 @@ function App() {
     const gameWasWon = loaded.guesses.includes(solution)
     if (gameWasWon) {
       setIsGameWon(true)
-    }
-    if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
-      setIsGameLost(true)
     }
     return loaded.guesses
   })
@@ -134,11 +130,7 @@ function App() {
   }, [isGameWon, isGameLost])
 
   const onChar = (value: string) => {
-    if (
-      currentGuess.length < MAX_WORD_LENGTH &&
-      guesses.length < MAX_CHALLENGES &&
-      !isGameWon
-    ) {
+    if (currentGuess.length < MAX_WORD_LENGTH && !isGameWon) {
       setCurrentGuess(`${currentGuess}${value}`)
     }
   }
@@ -186,22 +178,13 @@ function App() {
 
     const winningWord = isWinningWord(currentGuess)
 
-    if (
-      currentGuess.length === MAX_WORD_LENGTH &&
-      guesses.length < MAX_CHALLENGES &&
-      !isGameWon
-    ) {
+    if (currentGuess.length === MAX_WORD_LENGTH && !isGameWon) {
       setGuesses([...guesses, currentGuess])
       setCurrentGuess('')
 
       if (winningWord) {
         setStats(addStatsForCompletedGame(stats, guesses.length))
         return setIsGameWon(true)
-      }
-
-      if (guesses.length === MAX_CHALLENGES - 1) {
-        setStats(addStatsForCompletedGame(stats, guesses.length + 1))
-        setIsGameLost(true)
       }
     }
   }
