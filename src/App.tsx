@@ -25,6 +25,7 @@ import {
   ALERT_TIME_MS,
   REVEAL_TIME_MS,
   GAME_LOST_INFO_DELAY,
+  DISPLAYED_ROWS,
 } from './constants/settings'
 import {
   isWordInWordList,
@@ -63,6 +64,7 @@ function App() {
   )
   const [successAlert, setSuccessAlert] = useState('')
   const [isRevealing, setIsRevealing] = useState(false)
+  const [streakLength, setStreakLength] = useState(0)
   const [guesses, setGuesses] = useState<string[]>(() => {
     const loaded = loadGameStateFromLocalStorage()
     if (loaded?.solution !== solution) {
@@ -179,12 +181,17 @@ function App() {
     const winningWord = isWinningWord(currentGuess)
 
     if (currentGuess.length === MAX_WORD_LENGTH && !isGameWon) {
-      setGuesses([...guesses, currentGuess])
+      setStreakLength(streakLength + 1)
+      const nextGuesses = [...guesses, currentGuess]
+      setGuesses(nextGuesses)
       setCurrentGuess('')
 
       if (winningWord) {
-        setStats(addStatsForCompletedGame(stats, guesses.length))
+        setStats(addStatsForCompletedGame(stats, streakLength + 1))
         return setIsGameWon(true)
+      } else if (guesses.length === DISPLAYED_ROWS - 1) {
+        nextGuesses.shift()
+        setGuesses(nextGuesses)
       }
     }
   }

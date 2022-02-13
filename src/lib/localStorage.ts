@@ -23,7 +23,7 @@ export type GameStats = {
   bestStreak: number
   totalGames: number
   successRate: number
-  worstStreak: number
+  worstGame: number
 }
 
 export const saveStatsToLocalStorage = (gameStats: GameStats) => {

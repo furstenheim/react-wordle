@@ -15,15 +15,19 @@ export const addStatsForCompletedGame = (
 
   stats.totalGames += 1
 
-  stats.winDistribution[count] += 1
+  for (let i = 0; i < count; i ++) {
+    stats.winDistribution[i] = stats.winDistribution[i] || 0
+  }
+
+  stats.winDistribution[count - 1] += 1
   stats.currentStreak += 1
 
   if (stats.bestStreak < stats.currentStreak) {
     stats.bestStreak = stats.currentStreak
   }
 
-  if (stats.worstStreak < stats.currentStreak) {
-    stats.worstStreak = stats.currentStreak
+  if (stats.worstGame < count) {
+    stats.worstGame = count
   }
 
 
@@ -40,7 +44,7 @@ const defaultStats: GameStats = {
   bestStreak: 0,
   totalGames: 0,
   successRate: 0,
-  worstStreak: 0
+  worstGame: 0
 }
 
 export const loadStats = () => {
