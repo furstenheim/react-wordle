@@ -1,6 +1,6 @@
 import { WORDS } from '../constants/wordlist'
 import { VALID_GUESSES } from '../constants/validGuesses'
-import { getGuessStatuses } from './statuses'
+import {getGuessStatuses, getGuessStatusesAsString} from './statuses'
 
 export const isWordInWordList = (word: string) => {
   return (
@@ -52,6 +52,39 @@ export const getWordOfDay = () => {
     solutionIndex: index,
     tomorrow: nextday,
   }
+}
+
+export const findNextSolution = (runningSolutions: string[], allGuesses: string[], guesses: string[], currentSolution: string): string => {
+  const solutionsAsMap: { [key: string]: boolean } = {}
+  for (const solution of runningSolutions) {
+    solutionsAsMap[solution] = true
+  }
+  for (const guess of allGuesses) {
+    solutionsAsMap[guess] = true
+  }
+  const currentGuesses = guesses.map((guess) => getGuessStatusesAsString(currentSolution, guess))
+  let startIndex = solutionIndex
+  worldLoop: for (let i = 0; i < WORDS.length; i++) {
+    startIndex++
+    const index = startIndex % WORDS.length
+    const word = WORDS[index].toUpperCase()
+    if (solutionsAsMap[word]) {
+      continue
+    }
+    for (let i1 = 0; i1 < guesses.length; i1++){
+      const guess = guesses[i1]
+      const guessStatus = getGuessStatusesAsString(word, guess)
+      if (guessStatus !== currentGuesses[i1]) {
+        continue worldLoop
+      }
+    }
+    return word
+  }
+  return currentSolution
+}
+
+function randomInRange (minimum: number, maximum: number): number {
+  return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
 }
 
 export const { solution, solutionIndex, tomorrow } = getWordOfDay()

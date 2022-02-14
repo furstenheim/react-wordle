@@ -32,6 +32,7 @@ import {
   isWinningWord,
   solution,
   findFirstUnusedReveal,
+  findNextSolution,
 } from './lib/words'
 import { addStatsForCompletedGame, loadStats } from './lib/stats'
 import {
@@ -67,7 +68,7 @@ function App() {
   const [isRevealing, setIsRevealing] = useState(false)
   const [currentNumberOfGuesses, setCurrentNumberOfGuesses] = useState(0)
   const [runningSolutions, setRunningSolutions] = useState<string[]>(() => {
-    return [solution, solution]
+    return []
   })
   const [allGuesses, setAllGuesses] = useState<string[]>(() => {
     return []
@@ -210,7 +211,7 @@ function App() {
       setCurrentNumberOfGuesses(currentNumberOfGuesses + 1)
       const nextGuesses = [...guesses, currentGuess]
       const nextAllGueses = [...allGuesses, currentGuess]
-      const nextRunningSolutions = [...runningSolutions, solution]
+      const nextRunningSolutions = [...runningSolutions, currentSolution]
       setGuesses(nextGuesses)
       setAllGuesses(nextAllGueses)
       setCurrentGuess('')
@@ -220,8 +221,15 @@ function App() {
         setStats(addStatsForCompletedGame(stats, currentNumberOfGuesses + 1))
         return setIsGameWon(true)
       } else if (guesses.length === DISPLAYED_ROWS - 1) {
+        const nextCurrentSolution = findNextSolution(
+          nextRunningSolutions,
+          nextAllGueses,
+          nextGuesses,
+          currentSolution
+        )
         nextGuesses.shift()
         setGuesses(nextGuesses)
+        setCurrentSolution(nextCurrentSolution)
       }
     }
   }
