@@ -83,8 +83,4 @@ export const findNextSolution = (runningSolutions: string[], allGuesses: string[
   return currentSolution
 }
 
-function randomInRange (minimum: number, maximum: number): number {
-  return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
-}
-
 export const { solution, solutionIndex, tomorrow } = getWordOfDay()

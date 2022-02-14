@@ -56,7 +56,7 @@ function App() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [isWordNotFoundAlertOpen, setIsWordNotFoundAlertOpen] = useState(false)
-  const [isGameLost, setIsGameLost] = useState(false)
+  const [isGameLost] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem('theme')
       ? localStorage.getItem('theme') === 'dark'
@@ -132,7 +132,13 @@ function App() {
       runningSolutions,
       allGuesses,
     })
-  }, [guesses])
+  }, [
+    guesses,
+    allGuesses,
+    currentSolution,
+    currentNumberOfGuesses,
+    runningSolutions,
+  ])
 
   useEffect(() => {
     if (isGameWon) {
